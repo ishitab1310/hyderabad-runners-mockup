@@ -3,13 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hyderabad Runners- Behaviour Insights</title>
+<title>Hyderabad Runners — Behaviour Insights</title>
 <link rel="icon" href="logo.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="motion-strip"><span class="trail"></span><span class="runner">🏃</span></div>
+<div class="runner-badge">
+  <svg viewBox="0 0 64 64">
+    <circle cx="32" cy="14" r="6" fill="currentColor"/>
+    <line x1="32" y1="20" x2="32" y2="38" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <line class="arm1" x1="32" y1="24" x2="20" y2="32" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <line class="arm2" x1="32" y1="24" x2="44" y2="20" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <line class="leg1" x1="32" y1="38" x2="20" y2="54" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <line class="leg2" x1="32" y1="38" x2="46" y2="50" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+</div>
 
 <div class="topbar">
   <div class="brand">
@@ -20,6 +29,7 @@
     <nav>
       <a href="index.html" class="active">Dashboard</a>
       <a href="coach.html">Coach view</a>
+      <a href="log-activity.html">Log activity</a>
     </nav>
     <button class="theme-toggle" onclick="toggleTheme()">☀ / ☾</button>
   </div>
@@ -63,8 +73,6 @@
       <tr><td><a href="coach.html">Ginny Weasley</a></td><td><span class="tag engaged">Engaged</span></td><td>Today</td><td>Rahul V.</td><td class="dim">7 of 8 runs</td></tr>
     </tbody>
   </table>
-
-  
 </main>
 
 <script>

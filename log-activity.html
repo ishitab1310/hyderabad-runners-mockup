@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Harry Potter — Hyderabad Runners</title>
+<title>Log Activity — Hyderabad Runners</title>
 <link rel="icon" href="logo.png">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -28,43 +28,47 @@
   <div class="topbar-right">
     <nav>
       <a href="index.html">Dashboard</a>
-      <a href="coach.html" class="active">Coach view</a>
-      <a href="log-activity.html">Log activity</a>
+      <a href="coach.html">Coach view</a>
+      <a href="log-activity.html" class="active">Log activity</a>
     </nav>
     <button class="theme-toggle" onclick="toggleTheme()">☀ / ☾</button>
   </div>
 </div>
 
 <main>
-  <a href="index.html" class="back-link">← Back to dashboard</a>
+  <h1>Log activity</h1>
+  <p class="subtitle">Add or import runner participation data.</p>
 
-  <div class="runner-header">
-    <h1>Harry Potter</h1>
-    <span class="tag declining">Declining</span>
+  <div class="panel">
+    <h2>Add a single entry</h2>
+    <form class="form-grid" onsubmit="return false;">
+      <label>Runner
+        <input type="text" placeholder="e.g. Ron Weasley">
+      </label>
+      <label>Run / event
+        <input type="text" placeholder="e.g. Sunrise 5K">
+      </label>
+      <label>Date
+        <input type="date">
+      </label>
+      <label>Status
+        <select>
+          <option>Attended</option>
+          <option>Missed</option>
+        </select>
+      </label>
+    </form>
+    <div class="actions" style="margin-top: 16px;">
+      <button class="btn primary">Add entry</button>
+      <button class="btn ghost">Clear</button>
+    </div>
   </div>
 
   <div class="panel">
-    <h2>Recent activity</h2>
-    <ul class="timeline">
-      <li><span>Sat · Sunrise 5K</span><span class="missed">Missed</span></li>
-      <li><span>Sun · Long Run Sunday</span><span class="missed">Missed</span></li>
-      <li><span>Sat · City Loop 5.2K</span><span class="attended">Attended</span></li>
-      <li><span>Wed · Track Session</span><span class="missed">Missed</span></li>
-      <li><span>Sun · Long Run Sunday</span><span class="attended">Attended</span></li>
-      <li><span>Sat · Sunrise 5K</span><span class="attended">Attended</span></li>
-    </ul>
-  </div>
-
-  <div class="panel">
-    <h2>What the pattern shows</h2>
-    <p class="insight">Harry attended <strong>3 of the last 8</strong> group runs, down from a steady weekly habit over the two months before that. This looks like a <strong>declining</strong> pattern rather than a one-off gap. </p>
-
-  <div class="panel">
-    <h2>Suggested next step</h2>
+    <h2>Or import in bulk</h2>
+    <p class="dim" style="font-size:13px; margin: 0 0 14px;">Upload an existing sign-up sheet or event export instead of entering runs one by one.</p>
     <div class="actions">
-      <button class="btn primary">Send check-in message</button>
-      <button class="btn">Assign a buddy run</button>
-      <button class="btn ghost">Mark as reviewed</button>
+      <button class="btn">Upload attendance sheet (.csv)</button>
     </div>
   </div>
 </main>
