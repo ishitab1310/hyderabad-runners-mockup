@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hyderabad Runners- Behaviour Insights</title>
+<link rel="icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="motion-strip"><span class="trail"></span><span class="runner">🏃</span></div>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="logo.png" alt="Hyderabad Runners logo" class="logo">
+    <div>Hyderabad Runners<small>Behaviour Insights</small></div>
+  </div>
+  <div class="topbar-right">
+    <nav>
+      <a href="index.html" class="active">Dashboard</a>
+      <a href="coach.html">Coach view</a>
+    </nav>
+    <button class="theme-toggle" onclick="toggleTheme()">☀ / ☾</button>
+  </div>
+</div>
+
+<main>
+  <h1>Weekly engagement overview</h1>
+  <p class="subtitle">Updated Monday, 22 September · based on last week's run and event attendance</p>
+
+  <div class="stats">
+    <div class="stat"><div class="value">142</div><div class="label">Runners tracked</div></div>
+    <div class="stat"><div class="value">9</div><div class="label">Declining</div></div>
+    <div class="stat"><div class="value">4</div><div class="label">Disengaged</div></div>
+    <div class="stat"><div class="value">3</div><div class="label">Recovering</div></div>
+  </div>
+
+  <div class="filters">
+    <button class="filter active">All</button>
+    <button class="filter">Declining</button>
+    <button class="filter">Disengaged</button>
+    <button class="filter">Recovering</button>
+    <button class="filter">Engaged</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Runner</th>
+        <th>Pattern</th>
+        <th>Last active</th>
+        <th>Coach</th>
+        <th>Attendance (8 wks)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><a href="coach.html">Harry Potter</a></td><td><span class="tag declining">Declining</span></td><td>6 days ago</td><td>Priya S.</td><td class="dim">3 of 8 runs</td></tr>
+      <tr><td><a href="coach.html">Luna Lovegood</a></td><td><span class="tag disengaged">Disengaged</span></td><td>19 days ago</td><td>Rahul V.</td><td class="dim">1 of 8 runs</td></tr>
+      <tr><td><a href="coach.html">Neville Longbottom</a></td><td><span class="tag recovering">Recovering</span></td><td>2 days ago</td><td>Priya S.</td><td class="dim">4 of 8 runs</td></tr>
+      <tr><td><a href="coach.html">Hermione Granger</a></td><td><span class="tag engaged">Engaged</span></td><td>1 day ago</td><td>Rahul V.</td><td class="dim">8 of 8 runs</td></tr>
+      <tr><td><a href="coach.html">Ron Weasley</a></td><td><span class="tag declining">Declining</span></td><td>9 days ago</td><td>Priya S.</td><td class="dim">2 of 8 runs</td></tr>
+      <tr><td><a href="coach.html">Ginny Weasley</a></td><td><span class="tag engaged">Engaged</span></td><td>Today</td><td>Rahul V.</td><td class="dim">7 of 8 runs</td></tr>
+    </tbody>
+  </table>
+
+  
+</main>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  localStorage.setItem('theme', isLight ? 'dark' : 'light');
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+})();
+</script>
+</body>
+</html>
