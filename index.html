@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="runner-badge">
   <svg viewBox="0 0 64 64">
     <circle cx="32" cy="14" r="6" fill="currentColor"/>
@@ -19,7 +18,6 @@
     <line class="leg2" x1="32" y1="38" x2="46" y2="50" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
   </svg>
 </div>
-
 <div class="topbar">
   <div class="brand">
     <img src="logo.png" alt="Hyderabad Runners logo" class="logo">
@@ -27,64 +25,53 @@
   </div>
   <div class="topbar-right">
     <nav>
-      <a href="index.html" class="active">Dashboard</a>
-      <a href="coach.html">Coach view</a>
-      <a href="log-activity.html">Log activity</a>
+      <a href="index.html" class="active" aria-current="page">Overview</a>
+      <a href="global.html">Global view</a>
+      <a href="log-activity.html">Log week</a>
     </nav>
     <button class="theme-toggle" onclick="toggleTheme()">☀ / ☾</button>
   </div>
 </div>
-
 <main>
-  <h1>Weekly engagement overview</h1>
-  <p class="subtitle">Updated Monday, 22 September · based on last week's run and event attendance</p>
-
-  <div class="stats">
-    <div class="stat"><div class="value">142</div><div class="label">Runners tracked</div></div>
-    <div class="stat"><div class="value">9</div><div class="label">Declining</div></div>
-    <div class="stat"><div class="value">4</div><div class="label">Disengaged</div></div>
-    <div class="stat"><div class="value">3</div><div class="label">Recovering</div></div>
-  </div>
-
-  <div class="filters">
-    <button class="filter active">All</button>
-    <button class="filter">Declining</button>
-    <button class="filter">Disengaged</button>
-    <button class="filter">Recovering</button>
-    <button class="filter">Engaged</button>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Runner</th>
-        <th>Pattern</th>
-        <th>Last active</th>
-        <th>Coach</th>
-        <th>Attendance (8 wks)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td><a href="coach.html">Harry Potter</a></td><td><span class="tag declining">Declining</span></td><td>6 days ago</td><td>Priya S.</td><td class="dim">3 of 8 runs</td></tr>
-      <tr><td><a href="coach.html">Luna Lovegood</a></td><td><span class="tag disengaged">Disengaged</span></td><td>19 days ago</td><td>Rahul V.</td><td class="dim">1 of 8 runs</td></tr>
-      <tr><td><a href="coach.html">Neville Longbottom</a></td><td><span class="tag recovering">Recovering</span></td><td>2 days ago</td><td>Priya S.</td><td class="dim">4 of 8 runs</td></tr>
-      <tr><td><a href="coach.html">Hermione Granger</a></td><td><span class="tag engaged">Engaged</span></td><td>1 day ago</td><td>Rahul V.</td><td class="dim">8 of 8 runs</td></tr>
-      <tr><td><a href="coach.html">Ron Weasley</a></td><td><span class="tag declining">Declining</span></td><td>9 days ago</td><td>Priya S.</td><td class="dim">2 of 8 runs</td></tr>
-      <tr><td><a href="coach.html">Ginny Weasley</a></td><td><span class="tag engaged">Engaged</span></td><td>Today</td><td>Rahul V.</td><td class="dim">7 of 8 runs</td></tr>
-    </tbody>
-  </table>
+  <h1>Weekly overview</h1>
+  <p class="subtitle" id="sub"></p>
+  <div class="stats" id="stats"></div>
+  <section class="panel"><div class="panel-head"><h2>Needs you</h2><span class="dim small">Pattern Coach only suggests. You decide, then record what you did.</span></div>
+    <ul class="needs" id="needs"></ul>
+    <details class="aside" id="aw" hidden><summary>Set aside (<span id="ac">0</span>)</summary><ul class="needs" id="aside"></ul></details>
+  </section>
+  <div class="filters" id="filters"></div>
+  <div class="table-wrap"><table><thead><tr><th>Runner</th><th>State</th><th>Pattern</th><th>Last active</th><th>Last 8 weeks</th></tr></thead><tbody id="rows"></tbody></table></div>
+  <section class="panel" style="margin-top:16px"><div class="panel-head"><h2>Unusual weeks</h2><span class="dim small">Heavy rain, a festival. Marked weeks are ignored, so missing them never counts as a drop.</span></div>
+    <div class="table-wrap"><table class="plain"><thead><tr><th>Week</th><th>Group average</th><th>Unusual?</th><th>Reason</th></tr></thead><tbody id="wks"></tbody></table></div></section>
 </main>
-
+<script src="js/app.js"></script>
 <script>
-function toggleTheme() {
-  const html = document.documentElement;
-  const isLight = html.getAttribute('data-theme') === 'light';
-  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-  localStorage.setItem('theme', isLight ? 'dark' : 'light');
-}
-(function() {
-  const saved = localStorage.getItem('theme');
-  if (saved) document.documentElement.setAttribute('data-theme', saved);
+(function(){'use strict';var $=function(i){return document.getElementById(i)},esc=UI.esc;
+function needRow(v){var a=v.action,c;
+ if(a)c='<div class="done"><span class="done-label">'+esc(a.label)+' · week '+a.w+'</span>'+(a.outcome?'<span class="outcome">'+esc(a.outcome)+'</span>':'')+'<button type="button" class="linklike" data-undo="'+a.id+'">Undo</button></div>';
+ else c='<div class="actions tight">'+Object.keys(HR.ACT).map(function(k){return '<button type="button" class="btn sm'+(k=='not_concern'||k=='snooze'?' ghost':'')+'" data-act="'+k+'" data-id="'+esc(v.id)+'">'+esc(HR.ACT[k])+'</button>'}).join('')+'</div>';
+ return '<li class="need"><div class="need-main"><div class="need-title"><a href="coach.html?id='+encodeURIComponent(v.id)+'">'+esc(v.code)+'</a> '+UI.tag(v.state,v.sl)+' <span class="chip">'+esc(v.pl)+'</span></div><p class="need-reason">'+esc(v.reason)+'</p></div>'+c+'</li>'}
+var d,f='all',F=[['all','All'],['declining','Declining'],['disengaged','Disengaged'],['recovering','Recovering'],['engaged','Engaged'],['not_enough_data','Not enough data']],RS=['Heavy rain','Festival','Other'];
+function draw(){var s=d.stats;$('sub').textContent=d.group+' · '+d.size+' runners · data through week '+d.latest+' · synthetic demo data';
+ $('stats').innerHTML=[[s.runners,'Runners in group'],[s.needs,'Need you'],[s.declining,'Declining'],[s.disengaged,'Disengaged'],[s.recovering,'Recovering']].map(function(x){return '<div class="stat"><div class="value">'+x[0]+'</div><div class="label">'+x[1]+'</div></div>'}).join('');
+ $('needs').innerHTML=d.needs.length?d.needs.map(needRow).join(''):'<li class="empty">No one needs a check-in this week.</li>';
+ $('aw').hidden=!d.aside.length;$('ac').textContent=d.aside.length;$('aside').innerHTML=d.aside.map(needRow).join('');
+ $('filters').innerHTML=F.map(function(x){return '<button type="button" class="filter'+(f==x[0]?' active':'')+'" data-f="'+x[0]+'">'+x[1]+'</button>'}).join('');
+ $('rows').innerHTML=d.runners.filter(function(v){return f=='all'||v.state==f}).map(function(v){var u='coach.html?id='+encodeURIComponent(v.id);return '<tr data-href="'+u+'"><td><a href="'+u+'">'+esc(v.code)+'</a></td><td>'+UI.tag(v.state,v.sl)+'</td><td class="dim">'+esc(v.pl)+'</td><td class="dim">'+UI.ago(v.ago)+'</td><td>'+UI.spark(v.hist)+' <span class="dim small">'+v.sum+' sessions</span></td></tr>'}).join('')||'<tr><td colspan="5" class="empty">No runners in this state.</td></tr>';
+ $('wks').innerHTML=d.weeks.map(function(w){var k=RS.indexOf(w.note)>=0;return '<tr><td>Week '+w.w+'</td><td class="dim">'+(w.avg==null?'Not logged':(Math.round(w.avg*10)/10)+' sessions')+'</td><td><label class="check"><input type="checkbox" data-w="'+w.w+'"'+(w.u?' checked':'')+'> Unusual</label></td><td><select data-n="'+w.w+'"'+(w.u?'':' disabled')+'>'+RS.map(function(r){return '<option'+((k?w.note==r:r=='Other')?' selected':'')+'>'+r+'</option>'}).join('')+'</select></td></tr>'}).join('')}
+function load(){d=HR.needsYou();draw()}
+document.addEventListener('click',function(e){var t=e.target,b=t.closest('[data-act]'),u=t.closest('[data-undo]'),q=t.closest('[data-f]'),tr=t.closest('tr[data-href]');
+ if(b){HR.act(b.dataset.id,b.dataset.act);UI.toast('Saved: '+b.textContent+'.');load()}
+ else if(u){HR.undo(+u.dataset.undo);UI.toast('Undone.');load()}
+ else if(q){f=q.dataset.f;draw()}
+ else if(tr&&!t.closest('a'))location.href=tr.dataset.href});
+document.addEventListener('change',function(e){var t=e.target,k,r;
+ if(t.dataset.w){k=+t.dataset.w;r=HR.setNote(k,t.checked,document.querySelector('[data-n="'+k+'"]').value).changes.filter(function(c){return c.g==0});
+  var n=r.filter(function(c){return c.now}).length,c=r.filter(function(c){return c.cleared}).length;
+  UI.toast('Week '+k+(t.checked?' marked unusual. ':' back in the checks. ')+(n?n+' now need you.':c?c+' no longer need you.':'No one is flagged because of that week.'));load()}
+ else if(t.dataset.n){HR.setNote(+t.dataset.n,true,t.value);load()}});
+load();
 })();
 </script>
 </body>

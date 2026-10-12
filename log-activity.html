@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Log Activity — Hyderabad Runners</title>
+<title>Log a week — Hyderabad Runners</title>
 <link rel="icon" href="logo.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="runner-badge">
   <svg viewBox="0 0 64 64">
     <circle cx="32" cy="14" r="6" fill="currentColor"/>
@@ -19,7 +18,6 @@
     <line class="leg2" x1="32" y1="38" x2="46" y2="50" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
   </svg>
 </div>
-
 <div class="topbar">
   <div class="brand">
     <img src="logo.png" alt="Hyderabad Runners logo" class="logo">
@@ -27,62 +25,41 @@
   </div>
   <div class="topbar-right">
     <nav>
-      <a href="index.html">Dashboard</a>
-      <a href="coach.html">Coach view</a>
-      <a href="log-activity.html" class="active">Log activity</a>
+      <a href="index.html">Overview</a>
+      <a href="global.html">Global view</a>
+      <a href="log-activity.html" class="active" aria-current="page">Log week</a>
     </nav>
     <button class="theme-toggle" onclick="toggleTheme()">☀ / ☾</button>
   </div>
 </div>
-
 <main>
-  <h1>Log activity</h1>
-  <p class="subtitle">Add or import runner participation data.</p>
-
-  <div class="panel">
-    <h2>Add a single entry</h2>
-    <form class="form-grid" onsubmit="return false;">
-      <label>Runner
-        <input type="text" placeholder="e.g. Ron Weasley">
-      </label>
-      <label>Run / event
-        <input type="text" placeholder="e.g. Sunrise 5K">
-      </label>
-      <label>Date
-        <input type="date">
-      </label>
-      <label>Status
-        <select>
-          <option>Attended</option>
-          <option>Missed</option>
-        </select>
-      </label>
-    </form>
-    <div class="actions" style="margin-top: 16px;">
-      <button class="btn primary">Add entry</button>
-      <button class="btn ghost">Clear</button>
-    </div>
-  </div>
-
-  <div class="panel">
-    <h2>Or import in bulk</h2>
-    <p class="dim" style="font-size:13px; margin: 0 0 14px;">Upload an existing sign-up sheet or event export instead of entering runs one by one.</p>
-    <div class="actions">
-      <button class="btn">Upload attendance sheet (.csv)</button>
-    </div>
-  </div>
+  <h1>Log a week</h1>
+  <p class="subtitle">Record sessions attended for each runner. Pattern Coach re-checks everyone as soon as you save.</p>
+  <div class="panel"><h2>Attendance for the week</h2>
+    <div class="form-grid" style="margin-bottom:16px"><label>Week<select id="wk"></select></label><label>Group<input type="text" id="grp" readonly></label></div>
+    <div class="table-wrap"><table class="plain"><thead><tr><th>Runner</th><th>Usual per week</th><th>Sessions attended (0–4)</th></tr></thead><tbody id="grid"></tbody></table></div>
+    <div class="actions" style="margin-top:14px"><button type="button" class="btn sm" id="fu">Fill with usual</button><button type="button" class="btn sm" id="fz">Set everyone to 0</button></div>
+    <div class="unusual-box"><label class="check"><input type="checkbox" id="un"> This week was unusual</label><select id="rs" disabled><option>Heavy rain</option><option>Festival</option><option>Other</option></select><span class="dim small">Unusual weeks are ignored when checking for drops.</span></div>
+    <div class="actions" style="margin-top:16px"><button type="button" class="btn primary" id="save">Save week</button></div></div>
+  <div class="panel" id="res" hidden aria-live="polite"><h2 id="rt"></h2><div id="rc"></div><p style="margin:12px 0 0"><a href="index.html" class="back-link" style="margin:0">Open the overview</a></p></div>
 </main>
-
+<script src="js/app.js"></script>
 <script>
-function toggleTheme() {
-  const html = document.documentElement;
-  const isLight = html.getAttribute('data-theme') === 'light';
-  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-  localStorage.setItem('theme', isLight ? 'dark' : 'light');
-}
-(function() {
-  const saved = localStorage.getItem('theme');
-  if (saved) document.documentElement.setAttribute('data-theme', saved);
+(function(){'use strict';var $=function(i){return document.getElementById(i)},esc=UI.esc;
+var d;function ins(){return [].slice.call(document.querySelectorAll('#grid input'))}
+function fill(){var k=+$('wk').value,ex=k<=d.latest;$('grid').innerHTML=d.runners.map(function(v){var h=v.hist.filter(function(z){return z.w==k})[0],x=h&&h.a!=null?h.a:Math.round(v.usual);return '<tr><td>'+esc(v.code)+'</td><td class="dim">'+v.usual+'</td><td><input type="number" min="0" max="4" step="1" value="'+x+'" data-id="'+esc(v.id)+'" aria-label="Sessions by '+esc(v.code)+'"></td></tr>'}).join('');
+ var n=d.weeks.filter(function(z){return z.w==k})[0];$('un').checked=!!(n&&n.u);$('rs').disabled=!$('un').checked}
+function load(){d=HR.needsYou();$('grp').value=d.group+' ('+d.size+' runners)';var o=[d.latest+1,d.latest,d.latest-1];$('wk').innerHTML=o.map(function(k){return '<option value="'+k+'">Week '+k+(k>d.latest?' (next)':' (logged)')+'</option>'}).join('');fill()}
+$('wk').onchange=fill;$('un').onchange=function(){$('rs').disabled=!this.checked};
+$('fu').onclick=function(){ins().forEach(function(i){i.value=Math.round(d.runners.filter(function(v){return v.id==i.dataset.id})[0].usual)})};
+$('fz').onclick=function(){ins().forEach(function(i){i.value=0})};
+$('save').onclick=function(){var e={},bad=false;ins().forEach(function(i){var n=Number(i.value);if(i.value===''||!Number.isInteger(n)||n<0||n>4)bad=true;e[i.dataset.id]=n});
+ if(bad)return UI.toast('Sessions attended must be a whole number from 0 to 4.');
+ try{var k=+$('wk').value,r=HR.postWeek(k,e,$('un').checked,$('un').checked?$('rs').value:'');
+  var c=r.changes.filter(function(x){return x.g==0});$('res').hidden=false;$('rt').textContent='Week '+k+' saved';
+  $('rc').innerHTML=c.length?'<ul class="changes">'+c.map(function(x){return '<li><a href="coach.html?id='+encodeURIComponent(x.id)+'">'+esc(x.code)+'</a> '+UI.tag(x.from,HR.ST[x.from])+' <span class="dim">to</span> '+UI.tag(x.to,HR.ST[x.to])+'</li>'}).join('')+'</ul>':'<p class="dim">No one changed state.</p>';
+  UI.toast('Week '+k+' saved.');load()}catch(x){UI.toast(x.message)}};
+load();
 })();
 </script>
 </body>

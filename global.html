@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global view — Hyderabad Runners</title>
+<link rel="icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="runner-badge">
+  <svg viewBox="0 0 64 64">
+    <circle cx="32" cy="14" r="6" fill="currentColor"/>
+    <line x1="32" y1="20" x2="32" y2="38" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <line class="arm1" x1="32" y1="24" x2="20" y2="32" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <line class="arm2" x1="32" y1="24" x2="44" y2="20" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <line class="leg1" x1="32" y1="38" x2="20" y2="54" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <line class="leg2" x1="32" y1="38" x2="46" y2="50" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+</div>
+<div class="topbar">
+  <div class="brand">
+    <img src="logo.png" alt="Hyderabad Runners logo" class="logo">
+    <div>Hyderabad Runners<small>Behaviour Insights</small></div>
+  </div>
+  <div class="topbar-right">
+    <nav>
+      <a href="index.html">Overview</a>
+      <a href="global.html" class="active" aria-current="page">Global view</a>
+      <a href="log-activity.html">Log week</a>
+    </nav>
+    <button class="theme-toggle" onclick="toggleTheme()">☀ / ☾</button>
+  </div>
+</div>
+<main>
+  <div class="page-head"><div><h1>Global view</h1><p class="subtitle" id="sub"></p></div><button type="button" class="btn" id="exp">Export CSV</button></div>
+  <div class="stats" id="stats"></div>
+  <section class="panel"><div class="panel-head"><h2>Pattern mix</h2><span class="dim small">Attendance pattern of each runner, whole programme</span></div><div id="pm"></div></section>
+  <section class="panel"><div class="panel-head"><h2>Dropout by session type</h2><span class="dim small">Share of runners with no sessions for 3+ weeks</span></div><div id="dr"></div></section>
+  <section class="panel"><div class="panel-head"><h2>Attendance by week</h2><span class="dim small">Average sessions per runner. Shaded = marked unusual (the rain-week dip).</span></div><div id="wl"></div></section>
+  <section class="panel"><h2>Privacy</h2><p class="small" style="margin:0">Only weekly attendance, group, level, slot and join month are stored. IDs are salted hashes. Any group or pattern with fewer than 5 runners is hidden in every chart and in the CSV export.</p></section>
+</main>
+<script src="js/app.js"></script>
+<script>
+(function(){'use strict';var $=function(i){return document.getElementById(i)},esc=UI.esc;
+var g=HR.global(),pc=function(x){return Math.round(x*100)+'%'};
+$('sub').textContent=g.groups.length+' session groups · '+g.total+' runners · data through week '+g.latest+' · synthetic demo data';
+$('stats').innerHTML=[[g.total,'Runners tracked'],[g.active,'Active runners'],[g.flagged,'Flagged now'],[g.groups.filter(function(x){return !x.hidden}).length+' of '+g.groups.length,'Groups shown']].map(function(x){return '<div class="stat"><div class="value">'+x[0]+'</div><div class="label">'+x[1]+'</div></div>'}).join('');
+$('pm').innerHTML=UI.bars(g.pats.map(function(p){return {l:p.label,hidden:p.hidden,v:p.n,n:p.n}}),function(z){return z.n+' ('+pc(z.n/g.total)+')'});
+$('dr').innerHTML=UI.bars(g.groups.map(function(x){return {l:x.name,hidden:x.hidden,v:x.d/x.size,d:x.d,s:x.size}}),function(z){return pc(z.v)+' ('+z.d+' of '+z.s+')'});
+$('wl').innerHTML=UI.chart(g.weekly,{line:true,label:'Average sessions per runner by week'});
+function q(v){v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+$('exp').onclick=function(){var r=[['section','label','runners','share_or_rate']];
+ g.pats.forEach(function(p){if(!p.hidden)r.push(['pattern_mix',p.label,p.n,(p.n/g.total).toFixed(3)])});
+ g.groups.forEach(function(x){if(!x.hidden)r.push(['dropout_by_session_type',x.name,x.size,(x.d/x.size).toFixed(3)])});
+ g.weekly.forEach(function(w){if(w.avg!=null)r.push(['weekly_average','Week '+w.w+(w.u?' (unusual)':''),w.n,w.avg.toFixed(2)])});
+ var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.map(function(x){return x.map(q).join(',')}).join('\n')+'\n'],{type:'text/csv'}));a.download='programme-summary.csv';document.body.appendChild(a);a.click();a.remove()};
+})();
+</script>
+</body>
+</html>
